@@ -2,12 +2,12 @@
 The purpose of this project is to demonstrate the knowledge learned so far of React components, passing state, and requests with the Spotify API to build a website that allows users to search the Spotify library, create a custom playlist, then save it to their Spotify account.
 
 # Technologies used
-Visual Studio Code
-Git and GitHub
-Git Bash
-Create React App
-Spotify API
-Google Chrome
+* Visual Studio Code
+* Git and GitHub
+* Git Bash
+* Create React App
+* Spotify API
+* Google Chrome
 
 # Features
 * Users can search for songs by song title.
