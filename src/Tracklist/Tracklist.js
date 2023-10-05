@@ -1,9 +1,11 @@
+import React from 'react';
+import styles from './Tracklist.module.css';
+
 function Tracklist(props){
     return (
         <>
-            <p>{props.name}</p>
-            <p>{props.artist}</p>
-            <p>{props.album}</p>
+            <p className={styles.bold}>{props.name}</p>
+            <p>{props.artist} | {props.album}</p>
         </>
     );
 }
