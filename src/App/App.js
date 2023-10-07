@@ -11,17 +11,20 @@ function App() {
         name: "Through the Night",
         artist: "IU",
         album: "Palette",
+        id: uuidv4()
       },
       {
         name: "Good Day",
         artist: "IU",
         album: "REAL",
+        id: uuidv4()
       },
       {
         name: "Palette (feat. G-DRAGON)",
         artist: "IU",
         album: "Palette",
-      }
+        id: uuidv4()
+      },
     ]
   );
 
@@ -30,19 +33,21 @@ function App() {
       name: "iu playlist",
       tracks: 
       [
-        {
-          name: "Through the Night",
-          artist: "IU",
-          album: "Palette",
-        },
-        {
-          name: "Palette (feat. G-DRAGON)",
-          artist: "IU",
-          album: "Palette",
-        }
+        
       ]
     }
   );
+
+  const addTrackToPlaylist = (track) => {
+    const isFound = customPlaylist.tracks.some((element) => element.id === track.id);
+
+    if(!isFound){
+      setCustomPlaylist((prevState) => ({
+        ...prevState,
+        tracks: [...prevState.tracks, track]
+      }));
+    }
+  };
 
   return (
     <>
@@ -54,18 +59,22 @@ function App() {
         tracks.map((track) => {
           // we're in a function here so we return
           return (
-            <Tracklist 
-              name={track.name} 
-              artist={track.artist} 
-              album={track.album} 
-              key={uuidv4()} 
-            />
+            <>
+              <Tracklist 
+                name={track.name} 
+                artist={track.artist} 
+                album={track.album} 
+                key={track.id} 
+              />
+              <button onClick={() => addTrackToPlaylist(track)}>+</button>
+            </>
           )
+          
         })
       }
 
       <Playlist playlistName={customPlaylist.name} playlistTracks={customPlaylist.tracks}/>
-
+  
     </>
   );
 }
