@@ -47,7 +47,17 @@ function App() {
         tracks: [...prevState.tracks, track]
       }));
     }
+    console.log(customPlaylist);
   };
+
+  const removeTrackFromPlaylist = (track) => {
+    const updatedPlaylist = customPlaylist.tracks.filter((e) => e.id !== track.id);
+    setCustomPlaylist((prevState) => ({
+      ...prevState,
+      tracks: updatedPlaylist
+    }));
+    console.log('updatedPlaylist: ' + updatedPlaylist);
+};
 
   return (
     <>
@@ -73,7 +83,10 @@ function App() {
         })
       }
 
-      <Playlist playlistName={customPlaylist.name} playlistTracks={customPlaylist.tracks}/>
+      <Playlist 
+        customPlaylist={customPlaylist} 
+        removeTrackFromPlaylist={removeTrackFromPlaylist}
+      />
   
     </>
   );
