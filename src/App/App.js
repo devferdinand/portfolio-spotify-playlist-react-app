@@ -3,8 +3,13 @@ import React, {useState} from 'react';
 import Tracklist from '../Tracklist/Tracklist';
 import {v4 as uuidv4} from 'uuid';
 import Playlist from '../Playlist/Playlist';
+import styles from '../App/App.module.css'
 
 function App() {
+  /*
+    TODO
+      Call Spotify API to populate the tracks data based on user search input
+  */
   const [tracks, setTracks] = useState(
     [
       {
@@ -30,7 +35,7 @@ function App() {
 
   const [customPlaylist, setCustomPlaylist] = useState(
     {
-      name: "iu playlist",
+      name: "",
       tracks: 
       [
         
@@ -38,7 +43,7 @@ function App() {
     }
   );
 
-  const addTrackToPlaylist = (track) => {
+  const addTrackToCustomPlaylist = (track) => {
     const isFound = customPlaylist.tracks.some((element) => element.id === track.id);
 
     if(!isFound){
@@ -47,17 +52,20 @@ function App() {
         tracks: [...prevState.tracks, track]
       }));
     }
-    console.log(customPlaylist);
   };
 
-  const removeTrackFromPlaylist = (track) => {
-    const updatedPlaylist = customPlaylist.tracks.filter((e) => e.id !== track.id);
+  const removeTrackFromCustomPlaylist = (track) => {
+    const updatedCustomPlaylist = customPlaylist.tracks.filter((e) => e.id !== track.id);
     setCustomPlaylist((prevState) => ({
       ...prevState,
-      tracks: updatedPlaylist
+      tracks: updatedCustomPlaylist
     }));
-    console.log('updatedPlaylist: ' + updatedPlaylist);
 };
+
+  const handleCustomPlaylistInput = (newName) => {
+    const updatedCustomPlaylistName = { ...customPlaylist, name: newName};
+    setCustomPlaylist(updatedCustomPlaylistName);
+  }
 
   return (
     <>
@@ -76,18 +84,26 @@ function App() {
                 album={track.album} 
                 key={track.id} 
               />
-              <button onClick={() => addTrackToPlaylist(track)}>+</button>
+              <button onClick={() => addTrackToCustomPlaylist(track)}>+</button>
             </>
           )
           
         })
       }
-
+      <br/>
+      <br/>
+      <label htmlFor="userPlaylist" className={styles.bold}>Playlist Name: </label>
+      <input 
+        id="userPlaylist"
+        value={customPlaylist.name}
+        onChange={(e) => handleCustomPlaylistInput(e.target.value)}
+        name="userPlaylist"
+        type="text"
+      />
       <Playlist 
         customPlaylist={customPlaylist} 
-        removeTrackFromPlaylist={removeTrackFromPlaylist}
+        removeTrackFromCustomPlaylist={removeTrackFromCustomPlaylist}
       />
-  
     </>
   );
 }
