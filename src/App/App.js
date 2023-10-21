@@ -5,6 +5,7 @@ import {v4 as uuidv4} from 'uuid';
 import Playlist from '../Playlist/Playlist';
 import styles from '../App/App.module.css'
 import {getUserAuthorization, getUserAccessToken} from '../Spotify/spotify.js'
+import { getActiveElement } from '@testing-library/user-event/dist/utils';
 
 function App() {
   const spotifyBaseUrl = 'https://api.spotify.com';
@@ -56,6 +57,9 @@ function App() {
     const type = '&type=track'
     const url = `${spotifyBaseUrl}${searchRequestEndpoint}${userInput}${type}`;
     const token = getUserAccessToken();
+    if(!token){
+      throw new Error('Failed to get user access token');
+    }
 
     try{
       const response = await fetch(url, {
@@ -98,15 +102,51 @@ function App() {
         // update tracks state object
         setTracks(arr);
       }
+      else{
+        throw new Error('Failed to fetch response');
+      }
     }
     catch(error){
-      console.log(error);
+      console.error('Error fetching search request:', error);
+      throw error;
     }
     
   }
   
-  const saveCustomPlaylistToAccount = () => {
+  const getUserId = async () => {
+    const endpoint = '/v1/me';
+    const url = `${spotifyBaseUrl}${endpoint}`;
+    const token = getUserAccessToken();
+    if(!token){
+      throw new Error('Failed to get user access token');
+    }
+
+    try{
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if(response.ok){
+        const jsonResponse = await response.json();
+        return jsonResponse.id;
+      }
+      else{
+        throw new Error('Failed to fetch user data');
+      }
+    }
+    catch(error){
+      console.error('Error fetching user ID:', error);
+      throw error;
+    }
+  };
+
+  const saveCustomPlaylistToAccount = async () => {
     // Logic to save a custom playlist to Spotify
+    const userId = await getUserId();
+    
   };
 
   return (
