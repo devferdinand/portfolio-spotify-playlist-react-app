@@ -4,32 +4,16 @@ import Tracklist from '../Tracklist/Tracklist';
 import {v4 as uuidv4} from 'uuid';
 import Playlist from '../Playlist/Playlist';
 import styles from '../App/App.module.css'
+import {getUserAuthorization, getUserAccessToken} from '../Spotify/spotify.js'
 
 function App() {
-  /*
-    TODO
-      Call Spotify API to populate the tracks data based on user search input
-  */
+  const spotifyBaseUrl = 'https://api.spotify.com';
+
+  const [userInput, setUserInput] = useState('');
+  
   const [tracks, setTracks] = useState(
     [
-      {
-        name: "Through the Night",
-        artist: "IU",
-        album: "Palette",
-        id: uuidv4()
-      },
-      {
-        name: "Good Day",
-        artist: "IU",
-        album: "REAL",
-        id: uuidv4()
-      },
-      {
-        name: "Palette (feat. G-DRAGON)",
-        artist: "IU",
-        album: "Palette",
-        id: uuidv4()
-      },
+
     ]
   );
 
@@ -67,11 +51,74 @@ function App() {
     setCustomPlaylist(updatedCustomPlaylistName);
   }
 
+  const getSearchRequest = async () => {
+    const searchRequestEndpoint = '/v1/search?q=';
+    const type = '&type=track'
+    const url = `${spotifyBaseUrl}${searchRequestEndpoint}${userInput}${type}`;
+    const token = getUserAccessToken();
+
+    try{
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if(response.ok){
+        const arr = [];
+        const jsonResponse = await response.json();
+
+        // Traverse track
+        for(const key in jsonResponse.tracks.items){
+          // Create object and store track name
+          const obj = {
+            name: jsonResponse.tracks.items[key].name,
+          };
+
+          // store artist(s)
+          obj['artist'] = [];
+          for(const i in jsonResponse.tracks.items[key].artists){
+            obj['artist'].push(jsonResponse.tracks.items[key].artists[i].name);
+          }
+
+          // store album
+          obj['album'] = jsonResponse.tracks.items[key].album.name;
+
+          // store unique id
+          obj['id'] = uuidv4();
+
+          // store uri
+          obj['uri'] = jsonResponse.tracks.items[key].uri;
+
+          // push obj to array
+          arr.push(obj);
+        }
+        
+        // update tracks state object
+        setTracks(arr);
+      }
+    }
+    catch(error){
+      console.log(error);
+    }
+    
+  }
+  
+  const saveCustomPlaylistToAccount = () => {
+    // Logic to save a custom playlist to Spotify
+  };
+
   return (
     <>
-      <button>SEARCH</button>
-      <button>SAVE TO SPOTIFY</button>
-      
+      <button onClick={getSearchRequest}>SEARCH</button>
+      <br/>
+      <input
+        type="text"
+        id="searchInput"
+        value={userInput}
+        onChange={(e) => setUserInput(e.target.value)}
+      />
       <h1>Results</h1>
       {
         tracks.map((track) => {
@@ -104,6 +151,10 @@ function App() {
         customPlaylist={customPlaylist} 
         removeTrackFromCustomPlaylist={removeTrackFromCustomPlaylist}
       />
+      <br/>
+      <br/>
+      <button onClick={getUserAuthorization}>AUTHENTICATE</button>
+      <button onClick={saveCustomPlaylistToAccount}>SAVE TO SPOTIFY</button>
     </>
   );
 }
