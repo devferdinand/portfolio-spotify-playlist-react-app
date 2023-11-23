@@ -1,6 +1,9 @@
 # Portfolio Project: Jammming
 The purpose of this project is to demonstrate the knowledge learned so far of React components, passing state, and requests with the Spotify API to build a website that allows users to search the Spotify library, create a custom playlist, then save it to their Spotify account.
 
+# Demo
+![spotify-demo](https://github.com/devferdinand/portfolio-spotify-playlist-react-app/assets/134235450/48a1c8e6-9464-4d14-aa4c-353ee5498efb)
+
 # Technologies used
 * Visual Studio Code
 * Git and GitHub
