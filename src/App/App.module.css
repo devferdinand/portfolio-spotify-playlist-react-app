@@ -1,3 +1,60 @@
 .bold {
   font-weight: bold;
 }
+
+.purpleBackground {
+  background-color:darkmagenta;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.searchInput {
+  margin-bottom: 1rem;
+  width: 12rem;
+  height: 1rem;
+}
+
+.searchBtn {
+  color: white;
+  background-color:magenta;
+  border-radius: 10px;
+  width: 6rem;
+  height: 1.5rem;
+}
+
+.azure {
+  color: azure;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.childRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.authBtn {
+  color: white;
+  background-color:magenta;
+  border-radius: 10px;
+  width: 9rem;
+  height: 1.5rem;
+}
+
+.childRow {
+  display: flex;
+  align-items: center;
+}
+
+.addBtn {
+  position: absolute;
+  left: 800px;
+}

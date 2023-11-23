@@ -5,7 +5,6 @@ import {v4 as uuidv4} from 'uuid';
 import Playlist from '../Playlist/Playlist';
 import styles from '../App/App.module.css'
 import {getUserAuthorization, getUserAccessToken} from '../Spotify/spotify.js'
-import { getActiveElement } from '@testing-library/user-event/dist/utils';
 
 function App() {
   const spotifyBaseUrl = 'https://api.spotify.com';
@@ -143,59 +142,155 @@ function App() {
     }
   };
 
+  const createPlaylist = async (userId) => {
+    // create new playlist on user spotify account
+    const endpoint = `/v1/users/${userId}/playlists`;
+    const url = `${spotifyBaseUrl}${endpoint}`;
+    const token = getUserAccessToken();
+    if(!token){
+      throw new Error('Failed to get user access token');
+    }
+
+    try{
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          'name': customPlaylist.name,
+        })
+      });
+
+      if(response.ok){
+        const jsonResponse = await response.json();
+        return jsonResponse.id;
+      }
+      else{
+        throw new Error('Failed to create spotify playlist');
+      }
+    }
+    catch(error){
+      console.error('Error in creating spotify playlist:', error);
+      throw error;
+    }
+  };
+
+  const getCustomPlaylistUriTracks = (arr) => {
+    let retArr = [];
+    for(let i = 0; i < arr.length; i++){
+      retArr.push(arr[i]['uri']);
+    }
+    return retArr;
+  };
+
+  const emptyCustomPlaylist = () => {
+    setCustomPlaylist({
+      name: "",
+      tracks: []
+    });
+  }
+
   const saveCustomPlaylistToAccount = async () => {
     // Logic to save a custom playlist to Spotify
     const userId = await getUserId();
     
+    const spotifyPlaylistId = await createPlaylist(userId);
+
+    const endpoint = `/v1/users/${userId}/playlists/${spotifyPlaylistId}/tracks`;
+    const url = `${spotifyBaseUrl}${endpoint}`;
+    const token = getUserAccessToken();
+    if(!token){
+      throw new Error('Failed to get user access token');
+    }
+
+    try{
+      let uriTracks = getCustomPlaylistUriTracks(customPlaylist.tracks);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          'uris': uriTracks
+        })
+      });
+
+      if(response.ok){
+        const jsonResponse = await response.json();
+        emptyCustomPlaylist();
+      }
+      else{
+        throw new Error('Failed to add tracks to spotify playlist');
+      }
+    }
+    catch(error){
+      console.error('Error in adding tracks to spotify playlist:', error);
+      throw error;
+    }
   };
 
   return (
-    <>
-      <button onClick={getSearchRequest}>SEARCH</button>
+    <div className={styles.purpleBackground}>
+      <div className={styles.inputContainer}>
+        <input
+          type="text"
+          id="searchInput"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          className={styles.searchInput}
+        />
+        <div className={styles.childRow}>
+          <button onClick={getUserAuthorization} className={styles.authBtn}>AUTHENTICATE</button>
+          <button onClick={getSearchRequest} className={styles.searchBtn}>SEARCH</button>
+        </div>
+        
+      </div>
       <br/>
-      <input
-        type="text"
-        id="searchInput"
-        value={userInput}
-        onChange={(e) => setUserInput(e.target.value)}
-      />
-      <h1>Results</h1>
-      {
-        tracks.map((track) => {
-          // we're in a function here so we return
-          return (
-            <>
-              <Tracklist 
-                name={track.name} 
-                artist={track.artist} 
-                album={track.album} 
-                key={track.id} 
-              />
-              <button onClick={() => addTrackToCustomPlaylist(track)}>+</button>
-            </>
-          )
-          
-        })
-      }
-      <br/>
-      <br/>
-      <label htmlFor="userPlaylist" className={styles.bold}>Playlist Name: </label>
-      <input 
-        id="userPlaylist"
-        value={customPlaylist.name}
-        onChange={(e) => handleCustomPlaylistInput(e.target.value)}
-        name="userPlaylist"
-        type="text"
-      />
-      <Playlist 
-        customPlaylist={customPlaylist} 
-        removeTrackFromCustomPlaylist={removeTrackFromCustomPlaylist}
-      />
-      <br/>
-      <br/>
-      <button onClick={getUserAuthorization}>AUTHENTICATE</button>
-      <button onClick={saveCustomPlaylistToAccount}>SAVE TO SPOTIFY</button>
-    </>
+      <h1 className={styles.azure}>Results</h1>
+      <div className={`${styles.gridContainer}`}>
+        <div className={`${styles.leftDiv}`}>
+          {
+            tracks.map((track) => {
+              // we're in a function here so we return
+              return (
+                <div className={styles.childRow}>
+                  <div>
+                    <Tracklist 
+                      name={track.name} 
+                      artist={track.artist} 
+                      album={track.album} 
+                      key={track.id} 
+                    />
+                  </div>
+                  <button className={styles.addBtn} onClick={() => addTrackToCustomPlaylist(track)}>+</button>
+                </div>
+              )
+              
+            })
+          }
+        </div>
+        
+        <div className={`${styles.rightDiv}`}>
+          <label htmlFor="userPlaylist" className={`${styles.bold} ${styles.azure}`}>Playlist Name: </label>
+          <input 
+            id="userPlaylist"
+            value={customPlaylist.name}
+            onChange={(e) => handleCustomPlaylistInput(e.target.value)}
+            name="userPlaylist"
+            type="text"
+          />
+          <Playlist 
+            customPlaylist={customPlaylist} 
+            removeTrackFromCustomPlaylist={removeTrackFromCustomPlaylist}
+          />
+          <br></br>
+          <button onClick={saveCustomPlaylistToAccount}>SAVE TO SPOTIFY</button>
+        </div>
+      </div>
+    </div>
   );
 }
 

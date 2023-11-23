@@ -1,3 +1,25 @@
 .bold {
     font-weight: bold;
 }
+
+.titleColor {
+    color:orangered;
+}
+
+.lightgrey {
+    color: lightgrey;
+}
+
+.childRow {
+    display: flex;
+    align-items: center;
+}
+
+.removeBtn {
+    position: absolute;
+    left: 1800px;
+}
+
+.azure {
+    color: azure;
+}
